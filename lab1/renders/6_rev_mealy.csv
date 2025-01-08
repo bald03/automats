@@ -1,0 +1,21 @@
+// Mealy Machine
+digraph {
+	q1 [label=q1]
+	q2 [label=q2]
+	q1 -> q1 [label="z1/w2"]
+	q2 -> q1 [label="z1/w2"]
+	q1 -> q2 [label="z2/w1"]
+	q2 -> q2 [label="z2/w1"]
+	q1 -> q2 [label="z3/w1"]
+	q2 -> q1 [label="z3/w2"]
+	q1 -> q2 [label="z4/w1"]
+	q2 -> q2 [label="z4/w1"]
+	q1 -> q2 [label="z5/w1"]
+	q2 -> q2 [label="z5/w1"]
+	q1 -> q2 [label="z6/w1"]
+	q2 -> q2 [label="z6/w1"]
+	q1 -> q2 [label="z7/w1"]
+	q2 -> q1 [label="z7/w2"]
+	q1 -> q2 [label="z8/w1"]
+	q2 -> q2 [label="z8/w1"]
+}

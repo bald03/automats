@@ -1,0 +1,7 @@
+// Moore Machine
+digraph {
+	X1 [label="X1/"]
+	X2 [label="X2/w1"]
+	X1 -> X2 [label=z1]
+	X2 -> X2 [label=z1]
+}

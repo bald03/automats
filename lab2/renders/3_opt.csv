@@ -1,0 +1,18 @@
+// Mealy Machine
+digraph {
+	X1 [label=X1]
+	X3 [label=X3]
+	X2 [label=X2]
+	X1 -> X3 [label="z1/w5"]
+	X3 -> X3 [label="z1/w1"]
+	X2 -> X1 [label="z1/w2"]
+	X1 -> X3 [label="z2/w3"]
+	X3 -> X1 [label="z2/w6"]
+	X2 -> X2 [label="z2/w6"]
+	X1 -> X1 [label="z3/w5"]
+	X3 -> X2 [label="z3/w1"]
+	X2 -> X3 [label="z3/w2"]
+	X1 -> X1 [label="z4/w6"]
+	X3 -> X3 [label="z4/w7"]
+	X2 -> X3 [label="z4/w7"]
+}

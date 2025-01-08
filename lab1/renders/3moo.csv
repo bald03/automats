@@ -1,0 +1,18 @@
+// Moore Machine
+digraph {
+	R0 [label="R0/y1"]
+	R1 [label="R1/y1"]
+	R2 [label="R2/y2"]
+	R3 [label="R3/y2"]
+	R4 [label="R4/y3"]
+	R0 -> R3 [label=x1]
+	R1 -> R0 [label=x1]
+	R2 -> R0 [label=x1]
+	R3 -> R2 [label=x1]
+	R4 -> R2 [label=x1]
+	R0 -> R1 [label=x2]
+	R1 -> R4 [label=x2]
+	R2 -> R4 [label=x2]
+	R3 -> R0 [label=x2]
+	R4 -> R0 [label=x2]
+}

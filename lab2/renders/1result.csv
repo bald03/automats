@@ -1,0 +1,9 @@
+// Moore Machine
+digraph {
+	C0 [label="C0/w2"]
+	C1 [label="C1/w2"]
+	C2 [label="C2/w1"]
+	C0 -> C1 [label=z1]
+	C1 -> C2 [label=z1]
+	C2 -> C0 [label=z1]
+}

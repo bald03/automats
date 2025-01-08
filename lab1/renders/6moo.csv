@@ -1,0 +1,21 @@
+// Moore Machine
+digraph {
+	q1 [label="q1/w2"]
+	R1 [label="R1/w1"]
+	q1 -> q1 [label=z1]
+	R1 -> q1 [label=z1]
+	q1 -> R1 [label=z2]
+	R1 -> R1 [label=z2]
+	q1 -> R1 [label=z3]
+	R1 -> q1 [label=z3]
+	q1 -> R1 [label=z4]
+	R1 -> R1 [label=z4]
+	q1 -> R1 [label=z5]
+	R1 -> R1 [label=z5]
+	q1 -> R1 [label=z6]
+	R1 -> R1 [label=z6]
+	q1 -> R1 [label=z7]
+	R1 -> q1 [label=z7]
+	q1 -> R1 [label=z8]
+	R1 -> R1 [label=z8]
+}
