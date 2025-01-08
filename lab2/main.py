@@ -10,15 +10,17 @@ COMMAND_MOORE = "moore"
 # program moore-to-mealy moore.csv mealy.csv
 # program mealy-to-moore mealy.csv moore.csv
 def main(args):
-    command = COMMAND_MOORE
-    input_file_name = "9_moore.csv"
-    output_file_name = "1result.csv"
+    command = args[0]
+    input_file_name = args[1]
+    output_file_name = args[2]
     input_file = open(input_file_name, "r")
     output_file = open(output_file_name, "w+")
     if command == COMMAND_MEALY:
         mealy_transform_to_min(input_file, output_file)
+
     if command == COMMAND_MOORE:
         moore_transform_to_min(input_file, output_file)
+    output_file.close()
 
 
 if __name__ == '__main__':
