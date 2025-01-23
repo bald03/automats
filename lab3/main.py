@@ -185,8 +185,6 @@ def prepare_right_grammar(grammar, output_file):
 def main(args):
     input_file_name = args[0]
     output_file_name = args[1]
-    #input_file_name = "lg1.lg"
-    #output_file_name = "output.csv"
     input_file = open(input_file_name, "r",  encoding="utf-8")
     output_file = open(output_file_name, "w+", encoding="utf-8")
 
