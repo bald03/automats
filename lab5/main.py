@@ -123,115 +123,56 @@ class NFABuilder:
         self.state_count += 1
         return state
 
+    stack = []
+    transitions = defaultdict(lambda: defaultdict(list))
 
-    def create_symbol_nfa(self, symbol):
-        """Создать НКА для одного символа."""
-        start = self.create_state()
-        accept = self.create_state()
-        start.transitions[symbol] = [accept]
-        return NFA(start, accept)
+    start_state = new_state()
+    end_state = new_state()
 
-    def create_union_nfa(self, left, right):
-        """Создать НКА для операции '|'."""
-        start = self.create_state()
-        accept = self.create_state()
-        start.transitions[None] = [left.start, right.start]  # Пустые переходы
-        left.end.transitions[None] = [accept]
-        right.end.transitions[None] = [accept]
-        return NFA(start, accept)
+    for char in regex:
+        if char == '(':  # Группировка
+            stack.append((start_state, end_state))
+            start_state = new_state()
+            end_state = new_state()
+        elif char == ')':
+            old_start, old_end = stack.pop()  # Извлекаем старые состояния
+            transitions[old_end]['ε'].append(start_state)  # Соединяем старый конец с началом подграфа
+            transitions[end_state]['ε'].append(old_end)  # Завершаем подграф КАК БУДТО КАКАЯ ТО ХУЙНЯ И ПОЯВЛЯЕТСЯ ЦИКЛ 
+            transitions[old_start]['ε'].append(start_state)  # Важное соединение!
+            end_state = new_state()
+            start_state = old_end
+        elif char == '|':  # Альтернатива
+            alt_start = new_state()
+            alt_end = new_state()
+            transitions[alt_start]['ε'].extend([start_state, end_state])
+            transitions[end_state]['ε'].append(alt_end)
+            start_state, end_state = alt_start, alt_end
+        elif char == '*':  # Замыкание Клини
+            kleene_start = new_state()
+            kleene_end = new_state()
+            transitions[kleene_start]['ε'].extend([start_state, kleene_end])
+            transitions[end_state]['ε'].extend([start_state, kleene_end])
+            start_state, end_state = kleene_start, kleene_end
+        elif char == '+':  # Конкатенация
+            next_state = new_state()
+            transitions[start_state]['ε'].append(next_state)
+            start_state = next_state
+        else:  # Конкретный символ
+            next_state = new_state()
+            transitions[start_state][char].append(next_state)
+            start_state, end_state = next_state, end_state
 
-    def create_kleene_star_nfa(self, nfa):
-        """Создать НКА для операции '*'."""
-        start = self.create_state()
-        medium = self.create_state()
-        accept = self.create_state()
-        start.transitions[None] = [medium]  # Пустые переходы
-        medium.transitions[None] = [nfa.start, accept]
-        nfa.end.transitions[None] = [medium]
-        return NFA(start, accept)
+    return transitions, start_state, {end_state}
 
-    def create_plus_nfa(self, nfa):
-        """Создать НКА для операции '*'."""
-        start = self.create_state()
-        accept = self.create_state()
-        start.transitions[None] = [nfa.start]  # Пустые переходы
-        nfa.end.transitions[None] = [nfa.start, accept]
-        return NFA(start, accept)
+def write_nfa_to_csv(transitions, start_state, final_states, output_file):
+    """Записывает NFA в формате CSV."""
 
-    def nfa_plus_nfa(self, nfa1: NFA, nfa2: NFA):
-        """Создать НКА для операции '*'."""
-        start = self.create_state()
-        accept = self.create_state()
-        nfa1.end.transitions[None] = [nfa2.start]  # Пустые переходы
-        nfa2.end.transitions[None] = [accept]
-        start.transitions[None] = [nfa1.start]
-        return NFA(start, accept)
-
-    def build(self, node):
-        if isinstance(node, Literal):
-            return self.create_symbol_nfa(node.char)
-
-        elif isinstance(node, Concatenation):
-            left_nfa = self.build(node.left)
-            right_nfa = self.build(node.right)
-            return self.nfa_plus_nfa(left_nfa, right_nfa)
-        elif isinstance(node, Alternation):
-            left_nfa = self.build(node.left)
-            right_nfa = self.build(node.right)
-            return self.create_union_nfa(left_nfa, right_nfa)
-        elif isinstance(node, Star):
-            nfa = self.build(node.node)
-            return self.create_kleene_star_nfa(nfa)
-        elif isinstance(node, Group):
-            return self.build(node.node)
-        else:
-            raise ValueError(f"Unknown node type: {type(node)}")
-
-
-
-def main(args):
-    try:
-        output_file_name = args[0]
-        regex = args[1]
-    except Exception:
-        output_file_name = "output.csv"
-        regex = "(tw|y)*(tq|t)" #FIXME MOCK
-    output_file = open(output_file_name, "w+", encoding="utf-8")
-    output_file.close()
-
-    parser = RegexParser(regex)
-    ast = parser.parse()
-    print(ast)
-
-    # Построение НКА
-    builder = NFABuilder()
-    nfa = builder.build(ast)
-
-    def print_nfa(nfa):
-        visited = set()
-        stack = [nfa.start]
-
-        print("Состояния и переходы:")
-        while stack:
-            state = stack.pop()
-            if state.id in visited:
-                continue
-            visited.add(state.id)
-            for symbol, targets in state.transitions.items():
-                symbol_str = symbol if symbol is not None else "ε"
-                for target in targets:
-                    print(f"State {state.id} --{symbol_str}--> State {target.id}")
-                    stack.append(target)
-
-    print_nfa(nfa)
-    with open(output_file_name, 'w', newline='', encoding='utf-8') as file:
+    with open(output_file, 'w', newline='', encoding='utf-8'):
         # проверяем какое стартовое состояние и записываем сначала его
         output_dict = dict()
         output_dict[OUTPUT_CH] = []
         output_dict[QS] = []
 
-        # output_dict[OUTPUT_CH].append(";")
-        output_dict[QS].append(nfa.start.id)
 
         visited = set()
         end = nfa.end
